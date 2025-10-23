@@ -18,4 +18,7 @@ pip install -r requirements.txt
 streamlit run app.py
 
 ## 🌍 Deployment
+
 For Streamlit Cloud, add your API key in **Settings → Secrets**.
+
+You can check from : https://ai-pdf-chat-assistant.streamlit.app/
