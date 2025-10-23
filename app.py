@@ -24,22 +24,31 @@ def split_text(text, max_len=2000):
 
 # Ask AI with chunking and summarization
 def ask_ai(pdf_text, question):
-    model = genai.GenerativeModel("gemini-2.5-flash-lite")  # fast lite model
+    model = genai.GenerativeModel("gemini-2.5-flash-lite")
     chunks = split_text(pdf_text)
     summaries = []
 
-    # Summarize each chunk
     for i, chunk in enumerate(chunks):
         st.write(f"Processing chunk {i+1}/{len(chunks)}...")
         prompt = f"Summarize this text concisely in 50 words:\n{chunk}"
-        summary = model.generate_content(prompt, max_output_tokens=200).text
+
+        # Correct API call
+        response = model.generate_content(
+            contents=[{"type": "text", "text": prompt}],
+            max_output_tokens=200
+        )
+        summary = response.result[0].content[0].text
         summaries.append(summary)
 
     combined_summary = "\n".join(summaries)
 
-    # Answer the question using combined summary
     final_prompt = f"Based on the text below, answer the question concisely:\n\n{combined_summary}\n\nQuestion: {question}"
-    answer = model.generate_content(final_prompt, max_output_tokens=300).text
+    
+    response = model.generate_content(
+        contents=[{"type": "text", "text": final_prompt}],
+        max_output_tokens=300
+    )
+    answer = response.result[0].content[0].text
     return answer
 
 # File uploader
@@ -59,3 +68,4 @@ if uploaded_file:
                 st.write(answer)
         else:
             st.warning("Please enter a question.")
+
