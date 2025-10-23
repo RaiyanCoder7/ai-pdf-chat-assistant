@@ -2,11 +2,9 @@ import streamlit as st
 import google.generativeai as genai
 import PyPDF2
 import os
-from dotenv import load_dotenv
 
 # Load the API key
-load_dotenv()
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
 
 # Function to extract text from PDF
 def extract_text_from_pdf(uploaded_file):
@@ -44,4 +42,5 @@ if uploaded_file:
                 st.write(answer)
         else:
             st.warning("Please enter a question.")
+
 
