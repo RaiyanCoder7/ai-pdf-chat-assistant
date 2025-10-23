@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 # Load the API key
 load_dotenv()
-genai.configure(api_key=os.getenv("AIzaSyBNXf1ttCSYLDZQuc37IF3qmMaItoh6U_8"))
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 # Function to extract text from PDF
 def extract_text_from_pdf(uploaded_file):
@@ -44,3 +44,4 @@ if uploaded_file:
                 st.write(answer)
         else:
             st.warning("Please enter a question.")
+
