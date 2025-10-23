@@ -30,12 +30,12 @@ def ask_ai(pdf_text, question):
 
     for i, chunk in enumerate(chunks):
         st.write(f"Processing chunk {i+1}/{len(chunks)}...")
-        prompt = f"Summarize this text concisely in 50 words:\n{chunk}"
 
-        # Correct API call
         response = model.generate_content(
-            contents=[{"type": "text", "text": prompt}],
-            max_output_tokens=200
+            request={
+                "prompt": [{"type": "text", "text": f"Summarize this text concisely in 50 words:\n{chunk}"}],
+                "maxOutputTokens": 200
+            }
         )
         summary = response.result[0].content[0].text
         summaries.append(summary)
@@ -45,11 +45,14 @@ def ask_ai(pdf_text, question):
     final_prompt = f"Based on the text below, answer the question concisely:\n\n{combined_summary}\n\nQuestion: {question}"
     
     response = model.generate_content(
-        contents=[{"type": "text", "text": final_prompt}],
-        max_output_tokens=300
+        request={
+            "prompt": [{"type": "text", "text": final_prompt}],
+            "maxOutputTokens": 300
+        }
     )
     answer = response.result[0].content[0].text
     return answer
+
 
 # File uploader
 uploaded_file = st.file_uploader("Upload your PDF", type=["pdf"])
@@ -68,4 +71,5 @@ if uploaded_file:
                 st.write(answer)
         else:
             st.warning("Please enter a question.")
+
 
