@@ -3,8 +3,7 @@ import PyPDF2
 import os
 import google.generativeai as genai
 
-# Configure API key from Streamlit Secrets
-# Make sure you set your GOOGLE_API_KEY in Streamlit Secrets
+# Configure API key from Streamlit Secrets or environment variable
 genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
 
 # Streamlit page settings
@@ -46,25 +45,22 @@ def ask_ai(pdf_text, question):
     # Summarize each chunk
     for i, chunk in enumerate(chunks):
         st.write(f"Processing chunk {i+1}/{len(chunks)}...")
-        response = genai.generate_text(
+        response = genai.chat(
             model="gemini-2.5-flash-lite",
-            prompt=f"Summarize this text concisely in 50 words:\n{chunk}",
-            temperature=0.2,
-            max_output_tokens=200
+            messages=[{"role": "user", "content": f"Summarize this text concisely in 50 words:\n{chunk}"}]
         )
-        summaries.append(response.text)
+        summaries.append(response.last.content[0].text)
 
     combined_summary = "\n".join(summaries)
 
     # Answer the question based on combined summaries
     final_prompt = f"Based on the text below, answer the question concisely:\n\n{combined_summary}\n\nQuestion: {question}"
-    response = genai.generate_text(
+    response = genai.chat(
         model="gemini-2.5-flash-lite",
-        prompt=final_prompt,
-        temperature=0.2,
-        max_output_tokens=300
+        messages=[{"role": "user", "content": final_prompt}]
     )
-    return response.text
+
+    return response.last.content[0].text
 
 # -----------------------------
 # Streamlit UI
@@ -82,7 +78,7 @@ if uploaded_file:
 
         if st.button("Ask"):
             if question.strip():
-                with st.spinner("AI is thinking... this will be fast ⏳"):
+                with st.spinner("AI is thinking... this may take a few seconds ⏳"):
                     try:
                         answer = ask_ai(pdf_text, question)
                         st.subheader("💬 Answer:")
